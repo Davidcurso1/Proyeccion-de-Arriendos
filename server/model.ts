@@ -87,14 +87,18 @@ export class HousingModel {
   }
 
   private ensureDirsExist() {
-    const datasetsDir = path.join(process.cwd(), 'datasets');
-    const modelsDir = path.join(process.cwd(), 'models');
+    try {
+      const datasetsDir = path.join(process.cwd(), 'datasets');
+      const modelsDir = path.join(process.cwd(), 'models');
 
-    if (!fs.existsSync(datasetsDir)) {
-      fs.mkdirSync(datasetsDir, { recursive: true });
-    }
-    if (!fs.existsSync(modelsDir)) {
-      fs.mkdirSync(modelsDir, { recursive: true });
+      if (!fs.existsSync(datasetsDir)) {
+        fs.mkdirSync(datasetsDir, { recursive: true });
+      }
+      if (!fs.existsSync(modelsDir)) {
+        fs.mkdirSync(modelsDir, { recursive: true });
+      }
+    } catch (e) {
+      console.warn("[HousingModel warning] Could not verify or create directories (normal on read-only environments like Vercel):", e);
     }
   }
 
@@ -205,8 +209,12 @@ export class HousingModel {
 
     if (!fs.existsSync(csvPath)) {
       console.log('datasets/propiedades_medellin.csv code not found. Generating default mock data dataset...');
-      const csvContent = this.generateMockCSV();
-      fs.writeFileSync(csvPath, csvContent, 'utf-8');
+      try {
+        const csvContent = this.generateMockCSV();
+        fs.writeFileSync(csvPath, csvContent, 'utf-8');
+      } catch (err) {
+        console.error("[HousingModel error] Could not write default properties CSV:", err);
+      }
     }
 
     this.loadCSV(csvPath);
