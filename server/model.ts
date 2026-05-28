@@ -223,9 +223,19 @@ export class HousingModel {
 
   public loadCSV(filePath: string) {
     try {
+      console.log(`[HousingModel] Attempting to read properties CSV dataset from: ${filePath}`);
       const content = fs.readFileSync(filePath, 'utf-8');
+      this.loadCSVContent(content);
+    } catch (error) {
+      console.warn('[HousingModel warning] Could not read CSV dataset file. Falling back to in-memory dynamically generated properties...', error);
+      const fallbackContent = this.generateMockCSV();
+      this.loadCSVContent(fallbackContent);
+    }
+  }
+
+  public loadCSVContent(content: string) {
+    try {
       const lines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-      
       const properties: Property[] = [];
       
       // Skip headers (line 0)
@@ -298,7 +308,7 @@ export class HousingModel {
       this.properties = properties;
       console.log(`Successfully loaded ${properties.length} properties for the training pipeline.`);
     } catch (error) {
-      console.error('Error loading CSV dataset:', error);
+      console.error('Error parsing CSV dataset content:', error);
     }
   }
 
