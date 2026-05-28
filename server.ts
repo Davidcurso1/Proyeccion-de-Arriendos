@@ -427,6 +427,6 @@ async function startServer() {
 
 export default app;
 
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && !process.env.NETLIFY && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
   startServer();
 }
