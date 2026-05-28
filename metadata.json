@@ -1,0 +1,6 @@
+{
+  "name": "Predicciones de Arriendo Medellín",
+  "description": "Plataforma web para estimar y analizar el precio de arriendos en Medellín utilizando Machine Learning y analítica de datos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
