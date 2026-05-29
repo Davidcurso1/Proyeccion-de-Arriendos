@@ -138,10 +138,24 @@ export default function App() {
         const data = await resp.json();
         setPrediction(data);
       } else {
-        alert("Ocurrió un error en la predicción. Por favor verifica los valores.");
+        let errMsg = "Ocurrió un error en la predicción.";
+        try {
+          const errData = await resp.json();
+          if (errData && errData.error) {
+            errMsg += " Detalles del servidor: " + errData.error;
+          } else if (errData && typeof errData === "string") {
+            errMsg += " Detalles: " + errData;
+          } else {
+            errMsg += " Código de estado: " + resp.status;
+          }
+        } catch (_) {
+          errMsg += " Código de estado: " + resp.status;
+        }
+        alert(errMsg);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Prediction network failure:", err);
+      alert("Error de conexión al servidor: " + (err.message || err));
     } finally {
       setIsPredicting(false);
       setIsPredictingAI(false);

@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import * as fs from "fs";
-import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import { HousingModel, BARRIO_DATA, Property } from "./server/model";
 import { GoogleGenAI } from "@google/genai";
@@ -43,6 +42,15 @@ const ADMIN_USER = "admin";
 const ADMIN_PASS = "medellin2026";
 
 // API Endpoints - Keep them FIRST before Vite middleware
+
+// URL Rewrite Middleware for serverless functions compatibility (Netlify/AWS lambda)
+app.use((req, res, next) => {
+  if (req.url && req.url.startsWith("/.netlify/functions/api")) {
+    req.url = req.url.replace("/.netlify/functions/api", "/api");
+    console.log(`[Serverless Route Rewrite] ${req.method} rewritten to ${req.url}`);
+  }
+  next();
+});
 
 // Admin Authentication check
 app.post("/api/admin/login", (req, res) => {
@@ -407,6 +415,7 @@ app.get("/api/model/export", (req, res) => {
 async function startServer() {
   // Vite integration middleware setup for hot React rendering
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
